@@ -1,0 +1,33 @@
+{
+  "name": "course-fullstackopen-part4-blog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pattamite/Course-FullStackOpen-Part4-Blog.git"
+  },
+  "author": "Pattamite",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/Pattamite/Course-FullStackOpen-Part4-Blog/issues"
+  },
+  "homepage": "https://github.com/Pattamite/Course-FullStackOpen-Part4-Blog#readme",
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "nodemon": "^2.0.12"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "mongoose": "^6.0.5",
+    "mongoose-unique-validator": "^2.0.3"
+  }
+}
