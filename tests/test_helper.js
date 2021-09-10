@@ -1,4 +1,5 @@
 const Blog = require('../models/blog');
+const User = require('../models/user');
 
 const initialSingleBlogArr = [
   {
@@ -30,6 +31,12 @@ const initialMultipleBlogArr = [
   }
 ];
 
+const dummyUser = {
+  username: 'dummy',
+  name: 'dummy',
+  passwordHash: 'passwordHash',
+};
+
 async function getNonExistingId() {
   const blog = new Blog(initialSingleBlogArr[0]);
   await blog.save();
@@ -43,11 +50,18 @@ async function getBlogsInDb() {
   return blogs.map((blog) => {return blog.toJSON();});
 }
 
+async function getUsersInDb() {
+  const users = await User.find({});
+  return users.map((user) => {return user.toJSON();});
+}
+
 const test_helper = {
   initialSingleBlogArr,
   initialMultipleBlogArr,
+  dummyUser,
   getNonExistingId,
-  getBlogsInDb
+  getBlogsInDb,
+  getUsersInDb
 };
 
 module.exports = test_helper;

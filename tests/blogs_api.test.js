@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const supertest = require('supertest');
 const app = require('../app');
 const Blog = require('../models/blog');
+const User = require('../models/user');
 const helper = require('./test_helper');
 
 const api = supertest(app);
@@ -64,10 +65,21 @@ describe('viewing a specific blog', () => {
 });
 
 describe('addition of a new blog', () => {
+  let dummyuserId = null;
+
+  beforeEach(async () => {
+    await User.deleteMany({});
+    let userObject = new User(helper.dummyUser);
+    await userObject.save();
+
+    const users = await helper.getUsersInDb();
+    dummyuserId = users[0].id;
+  });
+
   test('a valid blog can be added', async () => {
     const newBlog = {
       title: 'testnew',
-      author: 'tester',
+      userId: dummyuserId,
       url: 'https://pattamite.com',
     };
 
@@ -85,12 +97,14 @@ describe('addition of a new blog', () => {
 
     const returnedBlog = response.body;
     expect(returnedBlog.likes).toEqual(0);
+    expect(returnedBlog.user).toEqual([dummyuserId]);
+    expect(returnedBlog.author).toEqual(helper.dummyUser.name);
   });
 
   test('an invalid blog can\'t be added', async () => {
     const newBlog = {
       title: 'testnew',
-      author: 'tester',
+      userId: dummyuserId,
     };
 
     await api

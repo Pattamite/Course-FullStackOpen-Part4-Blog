@@ -6,8 +6,7 @@ const blogSchema = new mongoose.Schema({
     required: true
   },
   author: {
-    type: String,
-    required: true
+    type: String
   },
   url: {
     type: String,
@@ -17,7 +16,13 @@ const blogSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 0
-  }
+  },
+  user: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ],
 });
 
 blogSchema.set('toJSON', {
