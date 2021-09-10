@@ -25,7 +25,6 @@ blogsRouter.get('/:id', async (request, response, next) => {
   try {
     const blog = await Blog.findById(request.params.id);
     if(blog) {
-      console.log('find', blog);
       response.json(blog);
     } else {
       response.status(404).end();
@@ -35,12 +34,13 @@ blogsRouter.get('/:id', async (request, response, next) => {
   }
 });
 
-blogsRouter.delete('/:id', (request, response, next) => {
-  Blog.findByIdAndRemove(request.params.id)
-    .then((result) => {
-      response.status(204).end();
-    })
-    .catch((error) => {next(error);});
+blogsRouter.delete('/:id', async (request, response, next) => {
+  try {
+    await Blog.findByIdAndRemove(request.params.id);
+    response.status(204).end();
+  } catch(exception) {
+    next(exception);
+  }
 });
 
 module.exports = blogsRouter;
