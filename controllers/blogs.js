@@ -19,7 +19,11 @@ blogsRouter.get('/', async (request, response, next) => {
 blogsRouter.post('/', async (request, response, next) => {
   try {
     const body = request.body;
-    const user = await User.findById(body.userId);
+    const user = await User.findById(request.userId);
+    if(!user) {
+      return response.status(401).json({ error: 'token missing or invalid' });
+    }
+
     const blog = new Blog({
       title: body.title,
       author: user.name,
@@ -52,9 +56,24 @@ blogsRouter.get('/:id', async (request, response, next) => {
 
 blogsRouter.delete('/:id', async (request, response, next) => {
   try {
+    const user = await User.findById(request.userId);
+    if(!(user)) {
+      return response.status(401).json({ error: 'token missing or invalid' });
+    }
+
+    const blog = await Blog.findById(request.params.id);
+    if(!blog) {
+      response.status(404).end();
+    }
+
+    if(blog.user.toString() !== user._id.toString()) {
+      return response.status(401).json({ error: 'permission denied' });
+    }
+
     await Blog.findByIdAndRemove(request.params.id);
     response.status(204).end();
   } catch(exception) {
+    console.log(exception);
     next(exception);
   }
 });

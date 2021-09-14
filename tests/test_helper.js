@@ -1,5 +1,7 @@
+const jwt = require('jsonwebtoken');
 const Blog = require('../models/blog');
 const User = require('../models/user');
+const config = require('../utils/config');
 
 const initialSingleBlogArr = [
   {
@@ -55,13 +57,26 @@ async function getUsersInDb() {
   return users.map((user) => {return user.toJSON();});
 }
 
+async function generateLoginTokenFromUser(user) {
+  const userForToken = {
+    username: user.username,
+    id: user.id,
+  };
+
+  return jwt.sign(
+    userForToken,
+    config.SECRET,
+  );
+}
+
 const test_helper = {
   initialSingleBlogArr,
   initialMultipleBlogArr,
   dummyUser,
   getNonExistingId,
   getBlogsInDb,
-  getUsersInDb
+  getUsersInDb,
+  generateLoginTokenFromUser,
 };
 
 module.exports = test_helper;

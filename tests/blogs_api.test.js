@@ -15,7 +15,7 @@ beforeEach(async () => {
   }
 });
 
-describe('when there is initially some notes saved', () => {
+describe('when there is initially some blogs saved', () => {
   test('blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
@@ -66,6 +66,8 @@ describe('viewing a specific blog', () => {
 
 describe('addition of a new blog', () => {
   let dummyuserId = null;
+  let dummyLoginToken = null;
+  let dummyAuthenType = { type: 'bearer' };
 
   beforeEach(async () => {
     await User.deleteMany({});
@@ -74,6 +76,7 @@ describe('addition of a new blog', () => {
 
     const users = await helper.getUsersInDb();
     dummyuserId = users[0].id;
+    dummyLoginToken = await helper.generateLoginTokenFromUser(users[0]);
   });
 
   test('a valid blog can be added', async () => {
@@ -85,6 +88,7 @@ describe('addition of a new blog', () => {
 
     const response = await api
       .post('/api/blogs')
+      .auth(dummyLoginToken, dummyAuthenType)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/);
@@ -109,6 +113,7 @@ describe('addition of a new blog', () => {
 
     await api
       .post('/api/blogs')
+      .auth(dummyLoginToken, dummyAuthenType)
       .send(newBlog)
       .expect(400);
 
@@ -118,19 +123,75 @@ describe('addition of a new blog', () => {
 });
 
 describe('deletion of a new blog', () => {
-  test('a blog can be deleted with status code 204', async () => {
+  let dummyuserId = null;
+  let dummyLoginToken = null;
+  let dummyAuthenType = { type: 'bearer' };
+  let targetBlogId = null;
+
+  beforeEach(async () => {
+    await User.deleteMany({});
+    let userObject = new User(helper.dummyUser);
+    await userObject.save();
+
+    const users = await helper.getUsersInDb();
+    dummyuserId = users[0].id;
+    dummyLoginToken = await helper.generateLoginTokenFromUser(users[0]);
+  });
+
+  test('an authorized blog can be deleted with status code 204', async () => {
+    const newBlog = {
+      title: 'testnew',
+      userId: dummyuserId,
+      url: 'https://pattamite.com',
+    };
+
+    const response = await api
+      .post('/api/blogs')
+      .auth(dummyLoginToken, dummyAuthenType)
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+    targetBlogId = response.body.id;
     const blogs = await helper.getBlogsInDb();
-    const targetBlog = blogs[0];
 
     await api
-      .delete(`/api/blogs/${targetBlog.id}`)
+      .delete(`/api/blogs/${targetBlogId}`)
+      .auth(dummyLoginToken, dummyAuthenType)
       .expect(204);
 
     const currentBlogs = await helper.getBlogsInDb();
     expect(currentBlogs).toHaveLength(blogs.length - 1);
 
     const blogsId = currentBlogs.map((blog) => {return blog.id;});
-    expect(blogsId).not.toContain(targetBlog.id);
+    expect(blogsId).not.toContain(targetBlogId);
+  });
+
+  test('an unauthorized blog can\'t be deleted then return with status code 401', async () => {
+    const newBlog = {
+      title: 'testnew',
+      userId: dummyuserId,
+      url: 'https://pattamite.com',
+    };
+
+    const response = await api
+      .post('/api/blogs')
+      .auth(dummyLoginToken, dummyAuthenType)
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+    targetBlogId = response.body.id;
+    const blogs = await helper.getBlogsInDb();
+
+    await api
+      .delete(`/api/blogs/${targetBlogId}`)
+      .auth(dummyLoginToken, dummyAuthenType)
+      .expect(204);
+
+    const currentBlogs = await helper.getBlogsInDb();
+    expect(currentBlogs).toHaveLength(blogs.length - 1);
+
+    const blogsId = currentBlogs.map((blog) => {return blog.id;});
+    expect(blogsId).not.toContain(targetBlogId);
   });
 });
 
