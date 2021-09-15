@@ -7,8 +7,10 @@ function Notification({ message, className }) {
   }
 
   return (
-    <div className={className}>
-      {message}
+    <div className='notification'>
+      <div className={className}>
+        {message}
+      </div>
     </div>
   );
 }
