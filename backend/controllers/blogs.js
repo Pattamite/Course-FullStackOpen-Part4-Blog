@@ -54,6 +54,42 @@ blogsRouter.get('/:id', async (request, response, next) => {
   }
 });
 
+blogsRouter.put('/:id', async (request, response, next) => {
+  try {
+    const body = request.body;
+    const user = await User.findById(request.userId);
+    if(!user) {
+      console.log('token missing or invalid');
+      return response.status(401).json({ error: 'token missing or invalid' });
+    }
+
+    const blog = await Blog.findById(request.params.id);
+    if(!blog) {
+      response.status(404).end();
+    }
+    if(blog.user.toString() !== user._id.toString()) {
+      return response.status(401).json({ error: 'permission denied' });
+    }
+
+    const newBlog = {
+      title: body.title,
+      author: user.name,
+      url: body.url,
+      user: user._id,
+      likes: body.likes
+    };
+
+    const savedBlog = await Blog.findByIdAndUpdate(request.params.id, newBlog, { new: true });
+    if(savedBlog) {
+      response.json(savedBlog);
+    } else {
+      response.status(404).end();
+    }
+  } catch(exception) {
+    next(exception);
+  }
+});
+
 blogsRouter.delete('/:id', async (request, response, next) => {
   try {
     const user = await User.findById(request.userId);
@@ -65,7 +101,6 @@ blogsRouter.delete('/:id', async (request, response, next) => {
     if(!blog) {
       response.status(404).end();
     }
-
     if(blog.user.toString() !== user._id.toString()) {
       return response.status(401).json({ error: 'permission denied' });
     }
