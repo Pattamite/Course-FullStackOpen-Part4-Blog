@@ -17,7 +17,7 @@ function BlogForm({ handleNewBlog }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="formDiv">
       <div>
         Title
         <input
@@ -25,6 +25,7 @@ function BlogForm({ handleNewBlog }) {
           value={blogTitle}
           name="Title"
           onChange={({ target }) => setBlogTitle(target.value)}
+          className="titleInput"
         />
       </div>
       <div>
@@ -34,6 +35,7 @@ function BlogForm({ handleNewBlog }) {
           value={blogUrl}
           name="Url"
           onChange={({ target }) => setBlogUrl(target.value)}
+          className="urlInput"
         />
       </div>
       <button type="submit">save</button>

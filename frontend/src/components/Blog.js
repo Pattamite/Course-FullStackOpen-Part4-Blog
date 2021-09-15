@@ -41,7 +41,7 @@ function Blog({
   }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog'>
       <h3>{`${blog.title} `}
         <button onClick={toggleVisibility}>{buttonLabel}</button>
         <button onClick={handleDelete}>delete</button>
